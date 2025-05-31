@@ -201,7 +201,34 @@ def get_user_info(identifier, by_id=False):
         
         # Add social links to the info dictionary
         info['social_links'] = social_links
-
+        
+        # Calculate engagement rate
+        try:
+            followers = int(info['followers']) if info['followers'] != 'No followers found' else 0
+            likes = int(info['likes']) if info['likes'] != 'No likes found' else 0
+            videos = int(info['videos']) if info['videos'] != 'No videos found' else 0
+            
+            if followers > 0:
+                # Basic engagement rate calculation: (likes / followers) * 100
+                basic_engagement_rate = (likes / followers) * 100
+                info['engagement_rate'] = round(basic_engagement_rate, 2)
+                
+                # Advanced engagement rate calculation
+                # If videos count is available, calculate average likes per video
+                if videos > 0:
+                    avg_likes_per_video = likes / videos
+                    advanced_engagement_rate = (avg_likes_per_video / followers) * 100
+                    info['advanced_engagement_rate'] = round(advanced_engagement_rate, 2)
+                else:
+                    info['advanced_engagement_rate'] = info['engagement_rate']
+            else:
+                info['engagement_rate'] = 0
+                info['advanced_engagement_rate'] = 0
+        except (ValueError, TypeError):
+            info['engagement_rate'] = 0
+            info['advanced_engagement_rate'] = 0
+            
+        print(info)
         # Print basic user information
         print("\n=== User Information ===")
         print(f"User ID: {info['user_id']}")
@@ -218,6 +245,8 @@ def get_user_info(identifier, by_id=False):
         print(f"Heart: {info['heart']}")
         print(f"Digg Count: {info['diggCount']}")
         print(f"SecUid: {info['secUid']}")
+        print(f"Basic Engagement Rate: {info['engagement_rate']}%")
+        print(f"Advanced Engagement Rate: {info['advanced_engagement_rate']}%")
         
         # Print biography
         print("\n=== Biography ===")
